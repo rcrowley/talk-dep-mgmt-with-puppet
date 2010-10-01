@@ -1,4 +1,4 @@
-set :remote, "/var/sandboxes/www/home/rcrowley/work/sfruby-2010-09-29"
+set :remote, "/home/rcrowley/work/sfruby-2010-09-29"
 
 role :www, "rcrowley.org"
 
