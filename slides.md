@@ -220,9 +220,6 @@
 		"/etc/nginx/sites-enabled/example":
 			ensure => "/etc/nginx/sites-available/example";
 		"/var/www/example":
-			a      => /foo/,
-			b      => "$bar",
-			c      => $baz,
 			ensure => directory;
 	}
 
