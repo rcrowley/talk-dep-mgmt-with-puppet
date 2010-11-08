@@ -17,16 +17,13 @@
 
 # Installing Puppet
 
-	sudo apt-get update
-	sudo apt-get -y install ruby ruby-dev \
-		rubygems libopenssl-ruby \
-		libshadow-ruby1.8
+* `apt-get install puppet`
 
-	sudo gem install rubygems-update
-	PATH=$PATH:/var/lib/gems/1.8/bin \
-		sudo update_rubygems
+* *or*
 
-	sudo gem install puppet
+* `gem install puppet`
+
+* You really want 2.6 or better.
 
 
 
@@ -52,16 +49,17 @@
 
 # Package resources
 
+	@@@ puppet
 	package { "nginx":
-		ensure => "0.7.65-1ubuntu2",
+		ensure => "0.7.67-3ubuntu1",
 	}
 
 	package {
 		"mysql2":
-			ensure   => "0.2.4",
+			ensure   => "0.2.6",
 			provider => gem;
 		"rails":
-			ensure   => "3.0.0",
+			ensure   => "3.0.1",
 			provider => gem;
 	}
 
@@ -71,9 +69,10 @@
 
 # A bug!
 
+	@@@ puppet
 	package {
 		"mysql2":
-			ensure   => "0.2.4",
+			ensure   => "0.2.6",
 			provider => gem;
 	}
 
@@ -85,11 +84,12 @@
 
 # Declare all dependencies
 
+	@@@ puppet
 	package {
 		"libmysqlclient-dev":
-			ensure => "5.1.41-3ubuntu12.3";
+			ensure => "5.1.49-1ubuntu8";
 		"mysql2":
-			ensure   => "0.2.4",
+			ensure   => "0.2.6",
 			provider => gem;
 	}
 
@@ -99,11 +99,12 @@
 
 # Nondeterminism!
 
+	@@@ puppet
 	package {
 		"libmysqlclient-dev":
-			ensure => "5.1.41-3ubuntu12.3";
+			ensure => "5.1.49-1ubuntu8";
 		"mysql2":
-			ensure   => "0.2.4",
+			ensure   => "0.2.6",
 			provider => gem;
 	}
 
@@ -113,53 +114,45 @@
 
 # Declare that dep
 
+	@@@ puppet
 	package {
 		"libmysqlclient-dev":
-			before => Package["mysql2"],
-			ensure => "5.1.41-3ubuntu12.3";
+			ensure => "5.1.49-1ubuntu8";
 		"mysql2":
-			ensure   => "0.2.4",
-			provider => gem;
+			ensure   => "0.2.6",
+			provider => gem,
+			require  =>
+				Package["libmysqlclient-dev"];
 	}
 
 
 
 !SLIDE bullets
 
-# Classes
-
-* Singletons.
-* Collections of resources.
-* May be named as dependencies.
+# Realistic example
 
 
 
-!SLIDE bullets smaller
+!SLIDE bullets
 
-# RubyGems and friends in a `class`
+# Ruby and RubyGems
 
-	class rubygems {
-		package {
-			"build-essential":
-				ensure => latest;
-			"ruby":
-				ensure => "4.2"; # 1.8.7
-			"ruby-dev":
-				ensure  => "4.2",
-				require => Package["build-essential"];
-			"rubygems": 
-				ensure => latest;
-			"rubygems-update":
-				ensure   => latest,
-				provider => gem,
-				require  => Package["rubygems"];
-		}
-		exec { "/bin/sh -c 'PATH=$PATH:/var/lib/gems/1.8/bin
-			update_rubygems'":
-			before  => Class["deps"],
-			require => Package["rubygems-update"],
-		}
+	@@@ puppet
+	package {
+		"build-essential":
+			ensure => latest,
+			stage  => "pre";
+		"ruby":
+			ensure => "4.5", # Ruby 1.8.7
+			stage  => "pre";
+		"ruby-dev":
+			ensure => "4.5", # Ruby 1.8.7
+			stage  => "pre";
+		"rubygems":
+			ensure => "1.3.7-2",
+			stage  => "pre";
 	}
+	stage { "pre": before => Stage["main"] }
 
 
 
@@ -188,25 +181,50 @@
 
 # `deps.pp`
 
-	# Put the rubygems class from above here.
-	include rubygems
-	class deps {
+	@@@ puppet
+	# Ruby and RubyGems from before goes here.
+
+	package {
 		"json":
-			ensure   => "1.4.2",
+			ensure   => "1.4.6",
 			provider => gem;
 		"libmysqlclient-dev":
-			ensure => "5.1.41-3ubuntu12.3";
+			ensure => "5.1.49-1ubuntu8";
 		"mysql2":
-			ensure   => "0.2.4",
+			ensure   => "0.2.6",
 			provider => gem,
 			require  => Package["libmysqlclient-dev"];
 		"nginx":
-			ensure => "0.7.65-1ubuntu2";
+			ensure => "0.7.67-3ubuntu1";
 		"sinatra":
-			ensure   => "1.0",
+			ensure   => "1.1.0",
 			provider => gem;
 	}
-	include deps
+
+
+
+!SLIDE bullets small
+
+# `deps.pp`, continued
+
+	@@@ puppet
+	file {
+		"/etc/nginx/sites-available/example":
+			content => "
+	server {
+		listen 80;
+		root /var/www/example;
+	}
+	",
+			ensure  => file;
+		"/etc/nginx/sites-enabled/example":
+			ensure => "/etc/nginx/sites-available/example";
+		"/var/www/example":
+			a      => /foo/,
+			b      => "$bar",
+			c      => $baz,
+			ensure => directory;
+	}
 
 
 
@@ -214,10 +232,16 @@
 
 # Running Puppet
 
-	sudo puppet apply deps.pp
+* `sudo puppet apply deps.pp`
 
 * Bring a new server up to speed.
 * Incrementally manage your devbox.
+
+
+
+!SLIDE bullets
+
+* <https://gist.github.com/668403>
 
 
 
