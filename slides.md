@@ -138,21 +138,16 @@
 # Ruby and RubyGems
 
 	@@@ puppet
-	package {
-		"build-essential":
-			ensure => latest,
-			stage  => "pre";
-		"ruby":
-			ensure => "4.5", # Ruby 1.8.7
-			stage  => "pre";
-		"ruby-dev":
-			ensure => "4.5", # Ruby 1.8.7
-			stage  => "pre";
-		"rubygems":
-			ensure => "1.3.7-2",
-			stage  => "pre";
-	}
 	stage { "pre": before => Stage["main"] }
+	class pre {
+		package {
+			"build-essential": ensure => latest;
+			"ruby": ensure => "4.5"; # Ruby 1.8.7
+			"ruby-dev": ensure => "4.5"; # Ruby 1.8.7
+			"rubygems": ensure => "1.3.7-2";
+		}
+	}
+	class { "pre": stage => "pre" }
 
 
 
