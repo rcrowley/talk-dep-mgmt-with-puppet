@@ -1,4 +1,4 @@
-set :remote, "/home/rcrowley/work/carbon-five-2010-11-11"
+set :remote, "/home/rcrowley/work/sfpython-2010-11-10"
 
 role :www, "rcrowley.org"
 
