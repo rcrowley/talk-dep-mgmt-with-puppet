@@ -17,13 +17,10 @@
 
 # Installing Puppet
 
-* `apt-get install puppet`
-
-* *or*
-
-* `gem install puppet`
-
-* You really want 2.6 or better.
+	@@@ sh
+	apt-get install build-essential \
+		ruby ruby-dev rubygems
+	gem install puppet puppet-pip
 
 
 
@@ -55,12 +52,12 @@
 	}
 
 	package {
-		"mysql2":
-			ensure   => "0.2.6",
-			provider => gem;
-		"rails":
-			ensure   => "3.0.1",
-			provider => gem;
+		"mysql-python":
+			ensure   => "1.2.3",
+			provider => pip;
+		"django":
+			ensure   => "1.2.3",
+			provider => pip;
 	}
 
 
@@ -71,12 +68,12 @@
 
 	@@@ puppet
 	package {
-		"mysql2":
-			ensure   => "0.2.6",
-			provider => gem;
+		"mysql-python":
+			ensure   => "1.2.3",
+			provider => pip;
 	}
 
-* Missing `libmysqlclient-dev` package which is needed to build `mysql2` gem.
+* Missing `libmysqlclient-dev` package which is needed to build `mysql-python` package.
 
 
 
@@ -88,9 +85,9 @@
 	package {
 		"libmysqlclient-dev":
 			ensure => "5.1.49-1ubuntu8";
-		"mysql2":
-			ensure   => "0.2.6",
-			provider => gem;
+		"mysql-python":
+			ensure   => "1.2.3",
+			provider => pip;
 	}
 
 
@@ -103,9 +100,9 @@
 	package {
 		"libmysqlclient-dev":
 			ensure => "5.1.49-1ubuntu8";
-		"mysql2":
-			ensure   => "0.2.6",
-			provider => gem;
+		"mysql-python":
+			ensure   => "1.2.3",
+			provider => pip;
 	}
 
 
@@ -118,9 +115,9 @@
 	package {
 		"libmysqlclient-dev":
 			ensure => "5.1.49-1ubuntu8";
-		"mysql2":
-			ensure   => "0.2.6",
-			provider => gem,
+		"mysql-python":
+			ensure   => "1.2.3",
+			provider => pip,
 			require  =>
 				Package["libmysqlclient-dev"];
 	}
@@ -133,26 +130,27 @@
 
 
 
-!SLIDE bullets
+!SLIDE bullets small
 
-# Ruby and RubyGems
+# Python and `pip`
 
 	@@@ puppet
-	package {
-		"build-essential":
-			ensure => latest,
-			stage  => "pre";
-		"ruby":
-			ensure => "4.5", # Ruby 1.8.7
-			stage  => "pre";
-		"ruby-dev":
-			ensure => "4.5", # Ruby 1.8.7
-			stage  => "pre";
-		"rubygems":
-			ensure => "1.3.7-2",
-			stage  => "pre";
-	}
 	stage { "pre": before => Stage["main"] }
+	class pre {
+		package {
+			"build-essential": ensure => latest;
+			"python": ensure => "";
+			"python-dev": ensure => "";
+			"python-setuptools": ensure => "";
+		}
+		exec { "easy_install pip":
+			path => "/usr/local/bin:/usr/bin:/bin",
+			refreshonly => true,
+			require => Package["python-setuptools"],
+			subscribe => Package["python-setuptools"],
+		}
+	}
+	class { "pre": stage => "pre" }
 
 
 
@@ -160,21 +158,15 @@
 
 # Puppet in your project
 
-	(master) rcrowley@wd-40:~/work/example$ ls -al
-	total 44
-	drwxr-xr-x 5 rcrowley rcrowley 4096 Sep 29 23:02 .
-	drwxr-xr-x 3 rcrowley rcrowley 4096 Sep 29 22:42 ..
-	drwxr-xr-x 7 rcrowley rcrowley 4096 Sep 29 22:42 .git
-	-rw-r--r-- 1 rcrowley rcrowley    6 Sep 29 22:59 .gitignore
-	-rw-r--r-- 1 rcrowley rcrowley 1672 Sep 29 23:00 Capfile
-	-rw-r--r-- 1 rcrowley rcrowley 2986 Sep 29 23:02 app.rb
-	-rw-r--r-- 1 rcrowley rcrowley  179 Sep 29 23:01 config.ru
-	-rw-r--r-- 1 rcrowley rcrowley   38 Sep 29 22:58 deps.pp
-	drwxr-xr-x 2 rcrowley rcrowley 4096 Sep 29 23:01 public
-	-rw-r--r-- 1 rcrowley rcrowley  798 Sep 29 23:01 unicorn.conf.rb
-	drwxr-xr-x 2 rcrowley rcrowley 4096 Sep 29 23:01 views
+	(master) rcrowley@wd-40:~/work/example$ ls -l
+	total 20
+	-rw-r--r-- 1 rcrowley rcrowley    0 Nov  9 01:36 __init__.py
+	-rw-r--r-- 1 rcrowley rcrowley 2700 Nov  9 01:40 deps.pp
+	-rw-r--r-- 1 rcrowley rcrowley   79 Nov  9 01:37 fabfile.py
+	-rw-r--r-- 1 rcrowley rcrowley  546 Nov  9 01:36 manage.py
+	-rw-r--r-- 1 rcrowley rcrowley 3388 Nov  9 01:36 settings.py
+	-rw-r--r-- 1 rcrowley rcrowley  484 Nov  9 01:36 urls.py
 	(master) rcrowley@wd-40:~/work/example$
-
 
 
 !SLIDE bullets small
@@ -182,23 +174,20 @@
 # `deps.pp`
 
 	@@@ puppet
-	# Ruby and RubyGems from before goes here.
+	# Python and pip from before goes here.
 
 	package {
-		"json":
-			ensure   => "1.4.6",
-			provider => gem;
+		"django":
+			ensure   => "1.2.3",
+			provider => pip;
 		"libmysqlclient-dev":
 			ensure => "5.1.49-1ubuntu8";
-		"mysql2":
-			ensure   => "0.2.6",
-			provider => gem,
+		"mysql-python":
+			ensure   => "1.2.3",
+			provider => pip,
 			require  => Package["libmysqlclient-dev"];
 		"nginx":
 			ensure => "0.7.67-3ubuntu1";
-		"sinatra":
-			ensure   => "1.1.0",
-			provider => gem;
 	}
 
 
@@ -229,7 +218,11 @@
 
 # Running Puppet
 
-* `sudo puppet apply deps.pp`
+	@@@ sh
+	# As root!
+	export GEMS="/usr/lib/ruby/gems/1.8/gems"
+	export RUBYLIB=$GEMS/"puppet-pip-0.0.1/lib"
+	puppet apply deps.pp
 
 * Bring a new server up to speed.
 * Incrementally manage your devbox.
@@ -238,7 +231,7 @@
 
 !SLIDE bullets
 
-* <https://gist.github.com/668403>
+* <https://gist.github.com/668598>
 
 
 
