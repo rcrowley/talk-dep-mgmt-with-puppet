@@ -22,6 +22,8 @@
 		ruby ruby-dev rubygems
 	gem install puppet puppet-pip
 
+* <https://github.com/rcrowley/puppet-pip>
+
 
 
 !SLIDE bullets
