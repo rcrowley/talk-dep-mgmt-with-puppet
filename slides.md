@@ -132,6 +132,22 @@
 
 
 
+!SLIDE bullets smaller
+
+# Puppet in your project
+
+	(master) rcrowley@wd-40:~/work/example$ ls -l
+	total 20
+	-rw-r--r-- 1 rcrowley rcrowley    0 Nov  9 01:36 __init__.py
+	-rw-r--r-- 1 rcrowley rcrowley 2700 Nov  9 01:40 deps.pp
+	-rw-r--r-- 1 rcrowley rcrowley   79 Nov  9 01:37 fabfile.py
+	-rw-r--r-- 1 rcrowley rcrowley  546 Nov  9 01:36 manage.py
+	-rw-r--r-- 1 rcrowley rcrowley 3388 Nov  9 01:36 settings.py
+	-rw-r--r-- 1 rcrowley rcrowley  484 Nov  9 01:36 urls.py
+	(master) rcrowley@wd-40:~/work/example$
+
+
+
 !SLIDE bullets small
 
 # Python and `pip`
@@ -154,21 +170,6 @@
 	}
 	class { "pre": stage => "pre" }
 
-
-
-!SLIDE bullets smaller
-
-# Puppet in your project
-
-	(master) rcrowley@wd-40:~/work/example$ ls -l
-	total 20
-	-rw-r--r-- 1 rcrowley rcrowley    0 Nov  9 01:36 __init__.py
-	-rw-r--r-- 1 rcrowley rcrowley 2700 Nov  9 01:40 deps.pp
-	-rw-r--r-- 1 rcrowley rcrowley   79 Nov  9 01:37 fabfile.py
-	-rw-r--r-- 1 rcrowley rcrowley  546 Nov  9 01:36 manage.py
-	-rw-r--r-- 1 rcrowley rcrowley 3388 Nov  9 01:36 settings.py
-	-rw-r--r-- 1 rcrowley rcrowley  484 Nov  9 01:36 urls.py
-	(master) rcrowley@wd-40:~/work/example$
 
 
 !SLIDE bullets small
