@@ -133,24 +133,6 @@
 
 
 
-!SLIDE bullets
-
-# Ruby and RubyGems
-
-	@@@ puppet
-	stage { "pre": before => Stage["main"] }
-	class pre {
-		package {
-			"build-essential": ensure => latest;
-			"ruby": ensure => "4.5"; # Ruby 1.8.7
-			"ruby-dev": ensure => "4.5"; # Ruby 1.8.7
-			"rubygems": ensure => "1.3.7-2";
-		}
-	}
-	class { "pre": stage => "pre" }
-
-
-
 !SLIDE bullets smaller
 
 # Puppet in your project
@@ -169,6 +151,24 @@
 	-rw-r--r-- 1 rcrowley rcrowley  798 Sep 29 23:01 unicorn.conf.rb
 	drwxr-xr-x 2 rcrowley rcrowley 4096 Sep 29 23:01 views
 	(master) rcrowley@wd-40:~/work/example$
+
+
+
+!SLIDE bullets
+
+# Ruby and RubyGems
+
+	@@@ puppet
+	stage { "pre": before => Stage["main"] }
+	class pre {
+		package {
+			"build-essential": ensure => latest;
+			"ruby": ensure => "4.5"; # Ruby 1.8.7
+			"ruby-dev": ensure => "4.5"; # Ruby 1.8.7
+			"rubygems": ensure => "1.3.7-2";
+		}
+	}
+	class { "pre": stage => "pre" }
 
 
 
